@@ -1,0 +1,14 @@
+auto-save/
+auto-save-list/
+custom.el
+eln-cache
+elpa
+history
+projectile-bookmarks.eld
+projects
+recentf
+snippets
+transient
+url
+.*
+!.gitignore
