@@ -12,3 +12,4 @@ transient
 url
 .*
 !.gitignore
+tramp/

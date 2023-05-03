@@ -323,6 +323,21 @@
 (use-package telega
   :ensure t
   :init
+  
+  ;; set company backend for telega
+  (setq telega-emoji-company-backend 'telega-company-emoji)
+  (defun my-telega-chat-mode ()
+	(set (make-local-variable 'company-backends)
+		 (append (list telega-emoji-company-backend
+                   'telega-company-username
+                   'telega-company-hashtag
+                   'telega-company-markdown-precode)
+				 (when (telega-chat-bot-p telega-chatbuf--chat)
+				   '(telega-company-botcmd))))
+	(company-mode 1))
+  
+(add-hook 'telega-chat-mode-hook 'my-telega-chat-mode)
+  ;; diable pair and god
   (defun my/tg-mode-hook()
 	(progn
 	  (setq-local god-global-mode nil)
