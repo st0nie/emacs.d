@@ -30,6 +30,11 @@
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
 
+;; tab-bar
+(tab-bar-mode 1)
+(define-key global-map (kbd "C-<next>") #'next-buffer)
+(define-key global-map (kbd "C-<prior>") #'previous-buffer)
+
 ;; mode-line
 (use-package diminish
   :ensure t)
@@ -373,6 +378,20 @@
 (use-package telega
   :ensure t
   :init
+
+  ;; fix avatar
+  (defun telega-buffer-face-mode-variable ()
+	(interactive)
+	(make-face 'my-telega-face)
+	;; (set-face-attribute 'my-telega-face nil :font "M+ 1m")
+	(set-face-attribute 'my-telega-face nil :font "Sarasa Term Slab SC")
+	
+	(setq buffer-face-mode-face 'my-telega-face)
+	(buffer-face-mode))
+
+  (add-hook 'telega-root-mode-hook 'telega-buffer-face-mode-variable)
+  (add-hook 'telega-webpage-mode-hook 'telega-buffer-face-mode-variable)
+  (add-hook 'telega-chat-mode-hook 'telega-buffer-face-mode-variable)
   
   ;; set company backend for telega
   (setq telega-emoji-company-backend 'telega-company-emoji)
@@ -391,7 +410,7 @@
   (defun my/tg-mode-hook()
 	(progn
 	  (setq-local god-global-mode nil)
-	  (electric-pair-mode -1)))
+	  (setq-local electric-pair-mode nil)))
   (add-hook 'telega-chat-mode-hook #'my/tg-mode-hook)
   (add-hook 'telega-root-mode-hook #'my/tg-mode-hook)
   ;; telega notify
@@ -456,20 +475,6 @@
   (define-key god-mode-isearch-map (kbd "i") #'god-mode-isearch-disable)
   (define-key god-mode-isearch-map (kbd "<escape>") #'isearch-abort)
   )
-
-;; tab
-(use-package all-the-icons
-  :ensure t)
-(use-package centaur-tabs
-  :ensure t
-  :demand
-  :config
-  (setq centaur-tabs-set-icons t)
-  (centaur-tabs-mode t)
-  (centaur-tabs-headline-match)
-  :bind
-  ("C-<prior>" . centaur-tabs-backward)
-  ("C-<next>" . centaur-tabs-forward))
 
 (use-package ts-fold
   :straight (ts-fold :type git :host github :repo "emacs-tree-sitter/ts-fold")
