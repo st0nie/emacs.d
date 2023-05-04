@@ -94,6 +94,9 @@
 (use-package company
   :ensure t
   :defer 150
+  :bind
+  (:map company-active-map
+		("<escape>" . company-abort))
   :init
   (setq company-tooltip-align-annotations t)
   (setq company-selection-wrap-around t)
@@ -108,12 +111,13 @@
     (apply fn args)))
   (advice-add 'company-capf--candidates :around #'just-one-face)
 )
-(use-package company-box
-  :ensure t
-  :hook (company-mode . company-box-mode)
-  :config
-  (diminish 'company-box-mode))
 
+;; very slow on wayland, disable it
+;; (use-package company-box
+;;   :ensure t
+;;   :hook (company-mode . company-box-mode)
+;;   :config
+;;   (diminish 'company-box-mode))
 
 ;; which-key
 (use-package which-key
@@ -376,9 +380,9 @@
   (defun my-telega-chat-mode ()
 	(set (make-local-variable 'company-backends)
 		 (append (list telega-emoji-company-backend
-                   'telega-company-username
-                   'telega-company-hashtag
-                   'telega-company-markdown-precode)
+					   'telega-company-username
+					   'telega-company-hashtag
+					   'telega-company-markdown-precode)
 				 (when (telega-chat-bot-p telega-chatbuf--chat)
 				   '(telega-company-botcmd))))
 	(company-mode 1))
