@@ -1,12 +1,31 @@
 ;; performance
 (setq gc-cons-threshold 100000000)
-(setq read-process-output-max 8192)
+(setq read-process-output-max (* 1024 1024))
+
+;; straight
+(setq package-enable-at-startup nil)
 
 (require 'package)
 (setq package-archives '(("gnu"    . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
                          ("nongnu" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")
                          ("melpa"  . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
-(package-initialize) ;; You might already have this line
+(package-initialize)
+
+;; straight bootstrap
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 6))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+(straight-use-package 'use-package)
 
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
@@ -149,6 +168,7 @@
 (defun my/replace-line()
   (interactive)
   (progn
+	(if mark-active (kill-region (region-beginning) (region-end)))
 	(beginning-of-line)
 	(kill-line)
 	(god-local-mode-pause)
@@ -163,10 +183,8 @@
 		(let ((bounds (bounds-of-thing-at-point 'word)))
 		  (if bounds
 			  (kill-region (car bounds) (cdr bounds))
-			(delete-char 1)
-			))
-		)
-	  (god-local-mode-pause))))
+			(delete-char 1)))))
+	(god-local-mode-pause)))
 
 (use-package consult
   :ensure t
@@ -395,17 +413,28 @@
          ("<S-left>" . multi-vterm-prev)))
 
 ;; god
+(defun my/god-mode-leave() (interactive)
+	   (progn
+		 (if (string-match-p "^[[:blank:]]*$"
+							 (buffer-substring (line-beginning-position)
+									  (line-end-position)))
+			 (indent-for-tab-command))
+		 (god-local-mode-pause)))
+
+(defun my/god-mode-esc() (interactive)
+		 (if (not god-local-mode)(god-local-mode +1)(keyboard-quit)))
+
 (use-package god-mode
   :ensure t
   :init
-  (global-set-key (kbd "<escape>") #'(lambda()(interactive)(if (not god-local-mode)(god-local-mode +1)(keyboard-escape-quit))))
-  
+  (global-set-key (kbd "<escape>") #'my/god-mode-esc)
+  (define-key minibuffer-local-map (kbd "<escape>") #'abort-minibuffers)
   :config
   (god-mode)
 
   ;; some maps
   (define-key god-local-mode-map (kbd ".") #'repeat)
-  (define-key god-local-mode-map (kbd "i") #'god-local-mode)
+  (define-key god-local-mode-map (kbd "i") #'my/god-mode-leave)
   
   ;; cursor and mode line
   (defun my-god-mode-update-cursor-type ()
@@ -440,6 +469,16 @@
   :bind
   ("C-<prior>" . centaur-tabs-backward)
   ("C-<next>" . centaur-tabs-forward))
+
+(use-package ts-fold
+  :straight (ts-fold :type git :host github :repo "emacs-tree-sitter/ts-fold")
+  :bind
+  ("C-z" . nil)
+  ("C-z C-o" . ts-fold-open)
+  ("C-z C-t" . ts-fold-toggle)
+  ("C-z C-c" . ts-fold-close)
+  :config
+  (global-ts-fold-mode))
 
 (add-hook 'ebuild-mode-hook 'company-ebuild-setup)
 (add-hook 'ebuild-mode-hook 'flycheck-pkgcheck-setup)
