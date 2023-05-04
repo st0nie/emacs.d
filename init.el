@@ -40,12 +40,12 @@
 ;; highlight line
 (add-hook 'prog-mode-hook #'hl-line-mode)
 (add-hook 'activate-mark-hook
-  (lambda ()
-    (hl-line-mode -1)))
+		  (lambda ()
+			(hl-line-mode -1)))
 (add-hook 'deactivate-mark-hook
-  (lambda ()
-	(if (derived-mode-p 'prog-mode)(hl-line-mode +1))
-	))
+		  (lambda ()
+			(if (derived-mode-p 'prog-mode)(hl-line-mode +1))
+			))
 
 ;; line number
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
@@ -108,9 +108,9 @@
   ;; orderless
   (defun just-one-face (fn &rest args)
 	(let ((orderless-match-faces [completions-common-part]))
-    (apply fn args)))
+      (apply fn args)))
   (advice-add 'company-capf--candidates :around #'just-one-face)
-)
+  )
 
 ;; very slow on wayland, disable it
 ;; (use-package company-box
@@ -157,8 +157,8 @@
   :init
   (setq orderless-component-separator "[ &]")
   (setq completion-styles '(orderless)
-	completion-category-defaults nil
-	completion-category-overrides '((file (styles . (partial-completion))))))
+		completion-category-defaults nil
+		completion-category-overrides '((file (styles . (partial-completion))))))
 (use-package marginalia
   :ensure t
   :bind (("M-A" . marginalia-cycle)
@@ -173,10 +173,9 @@
   (interactive)
   (progn
 	(if mark-active (kill-region (region-beginning) (region-end)))
-	(beginning-of-line)
+	(back-to-indentation)
 	(kill-line)
-	(god-local-mode-pause)
-	(indent-for-tab-command)))
+	(god-local-mode-pause)))
 
 (defun my/replace-word()
   (interactive)
@@ -358,8 +357,8 @@
   :ensure t
   :init
   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
-  :config
-  (global-tree-sitter-mode)
+:config
+(global-tree-sitter-mode)
 (use-package tree-sitter-langs
   :ensure t)
 
@@ -387,7 +386,7 @@
 				   '(telega-company-botcmd))))
 	(company-mode 1))
   
-(add-hook 'telega-chat-mode-hook 'my-telega-chat-mode)
+  (add-hook 'telega-chat-mode-hook 'my-telega-chat-mode)
   ;; diable pair and god
   (defun my/tg-mode-hook()
 	(progn
@@ -419,14 +418,12 @@
 ;; god
 (defun my/god-mode-leave() (interactive)
 	   (progn
-		 (if (string-match-p "^[[:blank:]]*$"
-							 (buffer-substring (line-beginning-position)
-									  (line-end-position)))
-			 (indent-for-tab-command))
+		 (if (string-match-p "^[[:blank:]]*$" (buffer-substring (line-beginning-position) (point)))
+			 (back-to-indentation))
 		 (god-local-mode-pause)))
 
 (defun my/god-mode-esc() (interactive)
-		 (if (not god-local-mode)(god-local-mode +1)(keyboard-quit)))
+	   (if (not god-local-mode)(god-local-mode +1)(keyboard-quit)))
 
 (use-package god-mode
   :ensure t
@@ -442,15 +439,15 @@
   
   ;; cursor and mode line
   (defun my-god-mode-update-cursor-type ()
-  (setq cursor-type (if (or god-local-mode buffer-read-only) 'box 'bar)))
+	(setq cursor-type (if (or god-local-mode buffer-read-only) 'box 'bar)))
   (add-hook 'post-command-hook #'my-god-mode-update-cursor-type)
 
   ;; overwrite mode
   (defun my-god-mode-toggle-on-overwrite ()
-  "Toggle god-mode on overwrite-mode."
-  (if (bound-and-true-p overwrite-mode)
-      (god-local-mode-pause)
-    (god-local-mode-resume)))
+	"Toggle god-mode on overwrite-mode."
+	(if (bound-and-true-p overwrite-mode)
+		(god-local-mode-pause)
+      (god-local-mode-resume)))
   (add-hook 'overwrite-mode-hook #'my-god-mode-toggle-on-overwrite)
 
   ;; isearch
