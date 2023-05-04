@@ -144,11 +144,40 @@
   :init
   (marginalia-mode))
 
-;; Example configuration for Consult
+;; configuration for Consult
+
+(defun my/replace-line()
+  (interactive)
+  (progn
+	(beginning-of-line)
+	(kill-line)
+	(god-local-mode-pause)
+	(indent-for-tab-command)))
+
+(defun my/replace-word()
+  (interactive)
+  (progn
+	(if mark-active
+		(kill-region (region-beginning) (region-end))
+	  (progn
+		(let ((bounds (bounds-of-thing-at-point 'word)))
+		  (if bounds
+			  (kill-region (car bounds) (cdr bounds))
+			(delete-char 1)
+			))
+		)
+	  (god-local-mode-pause))))
+
 (use-package consult
   :ensure t
   ;; Replace bindings. Lazily loaded due by `use-package'.
-  :bind (;; C-c bindings in `mode-specific-map'
+  :bind (
+		 ;; replace isearch
+		 ("C-s" . consult-line)
+		 ("C-S-R" . my/replace-line)
+		 ("C-r" . my/replace-word)
+		 ("C-S-D" . kill-word)
+		 ;; C-c bindings in `mode-specific-map'
          ("C-c M-x" . consult-mode-command)
          ("C-c h" . consult-history)
          ("C-c k" . consult-kmacro)
@@ -394,8 +423,8 @@
   ;; isearch
   (require 'god-mode-isearch)
   (define-key isearch-mode-map (kbd "<escape>") #'god-mode-isearch-activate)
-  (define-key god-mode-isearch-map (kbd "<escape>") #'god-mode-isearch-disable)
-
+  (define-key god-mode-isearch-map (kbd "i") #'god-mode-isearch-disable)
+  (define-key god-mode-isearch-map (kbd "<escape>") #'isearch-abort)
   )
 
 ;; tab
