@@ -60,8 +60,9 @@
 (column-number-mode 1)
 (line-number-mode 0)
 
-;; disable toll-bar
+;; disable tool-bar/menu-bar
 (tool-bar-mode -1)
+(menu-bar-mode -1)
 
 ;; tab-indent
 (setq-default tab-width 4)
@@ -410,7 +411,14 @@
   (define-key global-map (kbd "C-c t") telega-prefix-map))
 
 ;; term
+
+(defun my/vterm-leave-insert () (interactive)
+  (if god-local-mode (vterm--self-insert) (god-local-mode +1)))
+
 (use-package vterm
+  :bind
+  (:map vterm-mode-map
+		("<escape>" . my/vterm-leave-insert))
   :hook
   (vterm-mode . (lambda()(setq-local global-company-mode nil)))
   (vterm-mode . (lambda()(company-mode -1)))
@@ -433,10 +441,18 @@
 		 (god-local-mode-pause)))
 
 (defun my/god-mode-esc() (interactive)
-	   (if (not god-local-mode)(god-local-mode +1)(keyboard-quit)))
-
+	   (if (not god-local-mode) (god-local-mode +1)
+		 (progn
+		   (if (active-minibuffer-window)
+			   (progn
+				 (select-window (active-minibuffer-window))
+				 (abort-minibuffers))
+			 (keyboard-quit)))))
+ 
 (use-package god-mode
   :ensure t
+  :bind
+  ("C-S-F" . make-frame)
   :init
   (global-set-key (kbd "<escape>") #'my/god-mode-esc)
   (define-key minibuffer-local-map (kbd "<escape>") #'abort-minibuffers)
