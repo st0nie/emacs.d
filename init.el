@@ -30,10 +30,13 @@
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
 
-;; tab-bar
-(tab-bar-mode 1)
-(define-key global-map (kbd "C-<next>") #'next-buffer)
-(define-key global-map (kbd "C-<prior>") #'previous-buffer)
+;; tab-line
+(use-package bufler
+  :ensure t
+  :bind
+  ("C-S-b" . bufler-switch-buffer)
+  :config
+  (bufler-mode))
 
 ;; mode-line
 (use-package diminish
@@ -54,6 +57,8 @@
 
 ;; line number
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
+(column-number-mode 1)
+(line-number-mode 0)
 
 ;; disable toll-bar
 (tool-bar-mode -1)
@@ -177,9 +182,9 @@
 (defun my/replace-line()
   (interactive)
   (progn
-	(if mark-active (kill-region (region-beginning) (region-end)))
+	(if mark-active (delete-region (region-beginning) (region-end)))
 	(back-to-indentation)
-	(kill-line)
+	(delete-region (point) (line-end-position))
 	(god-local-mode-pause)))
 
 (defun my/replace-word()
@@ -190,7 +195,7 @@
 	  (progn
 		(let ((bounds (bounds-of-thing-at-point 'word)))
 		  (if bounds
-			  (kill-region (car bounds) (cdr bounds))
+			  (delete-region (car bounds) (cdr bounds))
 			(delete-char 1)))))
 	(god-local-mode-pause)))
 
@@ -378,20 +383,6 @@
 (use-package telega
   :ensure t
   :init
-
-  ;; fix avatar
-  (defun telega-buffer-face-mode-variable ()
-	(interactive)
-	(make-face 'my-telega-face)
-	;; (set-face-attribute 'my-telega-face nil :font "M+ 1m")
-	(set-face-attribute 'my-telega-face nil :font "Sarasa Term Slab SC")
-	
-	(setq buffer-face-mode-face 'my-telega-face)
-	(buffer-face-mode))
-
-  (add-hook 'telega-root-mode-hook 'telega-buffer-face-mode-variable)
-  (add-hook 'telega-webpage-mode-hook 'telega-buffer-face-mode-variable)
-  (add-hook 'telega-chat-mode-hook 'telega-buffer-face-mode-variable)
   
   ;; set company backend for telega
   (setq telega-emoji-company-backend 'telega-company-emoji)
