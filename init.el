@@ -34,6 +34,7 @@
 (use-package bufler
   :ensure t
   :bind
+  ("C-S-s" . bufler-workspace-frame-set)
   ("C-S-b" . bufler-switch-buffer)
   :config
   (bufler-mode))
@@ -451,9 +452,8 @@
  
 (use-package god-mode
   :ensure t
-  :bind
-  ("C-S-F" . make-frame)
   :init
+  (global-set-key (kbd "C-S-f") #'make-frame)
   (global-set-key (kbd "<escape>") #'my/god-mode-esc)
   (define-key minibuffer-local-map (kbd "<escape>") #'abort-minibuffers)
   :config
