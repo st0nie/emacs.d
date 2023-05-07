@@ -36,7 +36,7 @@
   :bind
   ("C-S-s" . bufler-workspace-frame-set)
   ("C-S-b" . bufler-switch-buffer)
-  :config
+  :init
   (bufler-mode))
 
 ;; mode-line
@@ -61,9 +61,8 @@
 (column-number-mode 1)
 (line-number-mode 0)
 
-;; disable tool-bar/menu-bar
+;; disable tool-bar
 (tool-bar-mode -1)
-(menu-bar-mode -1)
 
 ;; tab-indent
 (setq-default tab-width 4)
@@ -319,10 +318,13 @@
 ;; git/project
 (use-package projectile
   :ensure t
-  :config
+  :bind
+  (:map projectile-mode-map
+		("C-c p" . projectile-command-map))
+  :init
   (projectile-mode 1)
-  (diminish 'projectile-mode)
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
+  :config
+  (diminish 'projectile-mode))
 (use-package magit
   :ensure t)
 
@@ -333,8 +335,8 @@
 ;; ace-window
 (use-package ace-window
   :ensure t
-  :config
-  (global-set-key (kbd "M-o") 'ace-window))
+  :bind
+  ("M-o" . ace-window))
 
 ;; embark
 (use-package embark
@@ -406,10 +408,14 @@
 	  (setq-local electric-pair-mode nil)))
   (add-hook 'telega-chat-mode-hook #'my/tg-mode-hook)
   (add-hook 'telega-root-mode-hook #'my/tg-mode-hook)
-  ;; telega notify
+  ;; telega notify / indicator
   (add-hook 'telega-load-hook #'telega-notifications-mode)
+  (add-hook 'telega-load-hook #'telega-appindicator-mode)
   (setq telega-server-libs-prefix "/usr/")
-  (define-key global-map (kbd "C-c t") telega-prefix-map))
+  (define-key global-map (kbd "C-c t") telega-prefix-map)
+  
+  ;; animated images
+  (add-hook 'telega-load-hook #'telega-autoplay-mode))
 
 ;; term
 
