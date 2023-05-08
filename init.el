@@ -498,7 +498,9 @@
   (define-key god-mode-isearch-map (kbd "<escape>") #'isearch-abort)
   )
 
+;; fold
 (use-package ts-fold
+  :ensure t
   :straight (ts-fold :type git :host github :repo "emacs-tree-sitter/ts-fold")
   :bind
   ("C-z" . nil)
@@ -507,6 +509,16 @@
   ("C-z C-c" . ts-fold-close)
   :config
   (global-ts-fold-mode))
+
+;; template
+(use-package yatemplate
+  :ensure t
+  :init
+  (add-hook 'nxml-mode-hook #'yas-minor-mode)
+  (setq auto-insert-query nil)
+  (auto-insert-mode)
+  :config
+  (yatemplate-fill-alist))
 
 (add-hook 'ebuild-mode-hook 'company-ebuild-setup)
 (add-hook 'ebuild-mode-hook 'flycheck-pkgcheck-setup)
