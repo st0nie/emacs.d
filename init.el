@@ -47,6 +47,10 @@
 ;; hide warn
 (setq warning-minimum-level :error)
 
+;; split window
+(define-key global-map (kbd "C-(") #'split-window-right)
+(define-key global-map (kbd "C-)") #'split-window-below)
+
 ;; no blink cursor
 (blink-cursor-mode 0)
 
@@ -340,7 +344,8 @@
 (use-package ace-window
   :ensure t
   :bind
-  ("M-o" . ace-window))
+  ("M-o" . ace-window)
+  ("M-O" . ace-swap-window))
 
 ;; embark
 (use-package embark
