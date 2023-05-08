@@ -37,11 +37,15 @@
   ("C-S-s" . bufler-workspace-frame-set)
   ("C-S-b" . bufler-switch-buffer)
   :init
-  (bufler-mode))
+  (bufler-mode)
+  (bufler-tabs-mode))
 
 ;; mode-line
 (use-package diminish
   :ensure t)
+
+;; hide warn
+(setq warning-minimum-level :error)
 
 ;; no blink cursor
 (blink-cursor-mode 0)
