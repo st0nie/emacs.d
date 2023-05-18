@@ -27,6 +27,34 @@
 
 (straight-use-package 'use-package)
 
+;; https://emacs-china.org/t/package/19959
+;; package.el updates the saved version of package-selected-packages correctly only
+;; after custom-file has been loaded, which is a bug. We work around this by adding
+;; the required packages to package-selected-packages after startup is complete.
+;; Make `package-autoremove' work with `use-package'
+
+(defvar use-package-selected-packages '(use-package)
+  "Packages pulled in by use-package.")
+
+(eval-and-compile
+  (define-advice use-package-handler/:ensure (:around (fn name-symbol keyword args rest state) select)
+    (let ((items (funcall fn name-symbol keyword args rest state)))
+      (dolist (ensure args items)
+        (let ((package
+               (or (and (eq ensure t) (use-package-as-symbol name-symbol))
+                   ensure)))
+          (when package
+            (when (consp package)
+              (setq package (car package)))
+            (push `(add-to-list 'use-package-selected-packages ',package) items)))))))
+
+(when (fboundp 'package--save-selected-packages)
+  (add-hook 'after-init-hook
+            (lambda ()
+              (package--save-selected-packages
+               (seq-uniq (append use-package-selected-packages package-selected-packages))))))
+
+
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
 
@@ -429,7 +457,7 @@
 ;; term
 
 (defun my/vterm-leave-insert () (interactive)
-  (if god-local-mode (vterm--self-insert) (god-local-mode +1)))
+	   (if god-local-mode (vterm--self-insert) (god-local-mode +1)))
 
 (use-package vterm
   :bind
@@ -464,7 +492,7 @@
 				 (select-window (active-minibuffer-window))
 				 (abort-minibuffers))
 			 (keyboard-quit)))))
- 
+
 (use-package god-mode
   :ensure t
   :init
@@ -519,6 +547,93 @@
   (auto-insert-mode)
   :config
   (yatemplate-fill-alist))
+
+;;ligature
+(use-package ligature
+  :ensure t
+  :config
+  ;; Enable the "www" ligature in every possible major mode
+  (ligature-set-ligatures 't '("www"))
+  ;; Enable traditional ligature support in eww-mode, if the
+  ;; `variable-pitch' face supports it
+  (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
+  ;; Enable all Cascadia and Fira Code ligatures in programming modes
+  (ligature-set-ligatures 'prog-mode
+                          '(;; == === ==== => =| =>>=>=|=>==>> ==< =/=//=// =~
+							;; =:= =!=
+							("=" (rx (+ (or ">" "<" "|" "/" "~" ":" "!" "="))))
+							;; ;; ;;;
+							(";" (rx (+ ";")))
+							;; && &&&
+							("&" (rx (+ "&")))
+							;; !! !!! !. !: !!. != !== !~
+							("!" (rx (+ (or "=" "!" "\." ":" "~"))))
+							;; ?? ??? ?:  ?=  ?.
+							("?" (rx (or ":" "=" "\." (+ "?"))))
+							;; %% %%%
+							("%" (rx (+ "%")))
+							;; |> ||> |||> ||||> |] |} || ||| |-> ||-||
+							;; |->>-||-<<-| |- |== ||=||
+							;; |==>>==<<==<=>==//==/=!==:===>
+							("|" (rx (+ (or ">" "<" "|" "/" ":" "!" "}" "\]"
+											"-" "=" ))))
+							;; \\ \\\ \/
+							("\\" (rx (or "/" (+ "\\"))))
+							;; ++ +++ ++++ +>
+							("+" (rx (or ">" (+ "+"))))
+							;; :: ::: :::: :> :< := :// ::=
+							(":" (rx (or ">" "<" "=" "//" ":=" (+ ":"))))
+							;; // /// //// /\ /* /> /===:===!=//===>>==>==/
+							("/" (rx (+ (or ">"  "<" "|" "/" "\\" "\*" ":" "!"
+											"="))))
+							;; .. ... .... .= .- .? ..= ..<
+							("\." (rx (or "=" "-" "\?" "\.=" "\.<" (+ "\."))))
+							;; -- --- ---- -~ -> ->> -| -|->-->>->--<<-|
+							("-" (rx (+ (or ">" "<" "|" "~" "-"))))
+							;; *> */ *)  ** *** ****
+							("*" (rx (or ">" "/" ")" (+ "*"))))
+							;; www wwww
+							("w" (rx (+ "w")))
+							;; <> <!-- <|> <: <~ <~> <~~ <+ <* <$ </  <+> <*>
+							;; <$> </> <|  <||  <||| <|||| <- <-| <-<<-|-> <->>
+							;; <<-> <= <=> <<==<<==>=|=>==/==//=!==:=>
+							;; << <<< <<<<
+							("<" (rx (+ (or "\+" "\*" "\$" "<" ">" ":" "~"  "!"
+											"-"  "/" "|" "="))))
+							;; >: >- >>- >--|-> >>-|-> >= >== >>== >=|=:=>>
+							;; >> >>> >>>>
+							(">" (rx (+ (or ">" "<" "|" "/" ":" "=" "-"))))
+							;; #: #= #! #( #? #[ #{ #_ #_( ## ### #####
+							("#" (rx (or ":" "=" "!" "(" "\?" "\[" "{" "_(" "_"
+										 (+ "#"))))
+							;; ~~ ~~~ ~=  ~-  ~@ ~> ~~>
+							("~" (rx (or ">" "=" "-" "@" "~>" (+ "~"))))
+							;; __ ___ ____ _|_ __|____|_
+							("_" (rx (+ (or "_" "|"))))
+							;; Fira code: 0xFF 0x12
+							("0" (rx (and "x" (+ (in "A-F" "a-f" "0-9")))))
+							;; Fira code:
+							"Fl"  "Tl"  "fi"  "fj"  "fl"  "ft"
+							;; The few not covered by the regexps.
+							"{|"  "[|"  "]#"  "(*"  "}#"  "$>"  "^="))
+  ;; Enables ligature checks globally in all buffers. You can also do it
+  ;; per mode with `ligature-mode'.
+  (global-ligature-mode t))
+
+;; doom theme
+(use-package doom-themes
+  :ensure t)
+
+;; auto-format
+(use-package format-all
+  :ensure t)
+
+;; org
+(use-package org-bullets
+  :ensure t
+  :hook
+  (org-mode . org-bullets-mode))
+
 
 (add-hook 'ebuild-mode-hook 'company-ebuild-setup)
 (add-hook 'ebuild-mode-hook 'flycheck-pkgcheck-setup)
