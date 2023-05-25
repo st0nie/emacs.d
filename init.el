@@ -159,6 +159,11 @@
   (advice-add 'company-capf--candidates :around #'just-one-face)
   )
 
+(use-package company-quickhelp
+  :ensure t
+  :config
+  (company-quickhelp-mode))
+
 ;; very slow on wayland, disable it
 ;; (use-package company-box
 ;;   :ensure t
@@ -629,11 +634,25 @@
   :ensure t)
 
 ;; org
+(add-hook 'org-src-mode-hook 'god-local-mode-pause)
 (use-package org-bullets
   :ensure t
   :hook
   (org-mode . org-bullets-mode))
 
+(use-package org-contrib
+  :ensure t)
 
+(use-package org2ctex
+  :ensure t
+  :hook
+  (org-mode . org2ctex-mode))
+
+(use-package avy
+  :ensure t
+  :bind
+  ("C-:" . avy-goto-word-0))
+
+;; ebuild
 (add-hook 'ebuild-mode-hook 'company-ebuild-setup)
 (add-hook 'ebuild-mode-hook 'flycheck-pkgcheck-setup)
