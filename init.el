@@ -391,9 +391,7 @@
 
 ;; term
 (use-package vterm
-  :bind
   :hook
-  (vterm-mode . (lambda()(evil-local-mode -1)))
   (vterm-mode . (lambda()(company-mode -1)))
   :custom
   (setq vterm-timer-delay 0.01)
@@ -513,6 +511,8 @@
 
 (use-package org-bullets
   :ensure t
+  :custom
+  (org-startup-indented t)
   :hook
   (org-mode . org-bullets-mode))
 
