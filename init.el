@@ -410,6 +410,7 @@
 (use-package god-mode
   :ensure t
   :init
+  (add-hook 'buffer-list-update-hook (lambda () (god-local-mode -1)))
   (global-set-key (kbd "C-S-f") #'make-frame)
   :config
   ;; some maps
