@@ -6,9 +6,10 @@
 (setq package-enable-at-startup nil)
 
 (require 'package)
-(setq package-archives '(("gnu" . "https://mirrors.ustc.edu.cn/elpa/gnu/")
-                         ("melpa" . "https://mirrors.ustc.edu.cn/elpa/melpa/")
-                         ("nongnu" . "https://mirrors.ustc.edu.cn/elpa/nongnu/")))
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
+;; and `package-pinned-packages`. Most users will not need or want to do this.
+;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
 
 ;; straight bootstrap
@@ -54,19 +55,8 @@
               (package--save-selected-packages
                (seq-uniq (append use-package-selected-packages package-selected-packages))))))
 
-
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
-
-;; tab-line
-(use-package bufler
-  :ensure t
-  :bind
-  ("C-S-s" . bufler-workspace-frame-set)
-  ("C-S-b" . bufler-switch-buffer)
-  :init
-  (bufler-mode)
-  (bufler-tabs-mode))
 
 ;; mode-line
 (use-package diminish
@@ -86,11 +76,10 @@
 (add-hook 'prog-mode-hook #'hl-line-mode)
 (add-hook 'activate-mark-hook
 		  (lambda ()
-			(hl-line-mode -1)))
+		    (hl-line-mode -1)))
 (add-hook 'deactivate-mark-hook
 		  (lambda ()
-			(if (derived-mode-p 'prog-mode)(hl-line-mode +1))
-			))
+			(if (derived-mode-p 'prog-mode)(hl-line-mode +1))))
 
 ;; line number
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
@@ -164,13 +153,6 @@
   :config
   (company-quickhelp-mode))
 
-;; very slow on wayland, disable it
-;; (use-package company-box
-;;   :ensure t
-;;   :hook (company-mode . company-box-mode)
-;;   :config
-;;   (diminish 'company-box-mode))
-
 ;; which-key
 (use-package which-key
   :ensure t
@@ -221,35 +203,12 @@
 
 ;; configuration for Consult
 
-(defun my/replace-line()
-  (interactive)
-  (progn
-	(if mark-active (delete-region (region-beginning) (region-end)))
-	(back-to-indentation)
-	(delete-region (point) (line-end-position))
-	(god-local-mode-pause)))
-
-(defun my/replace-word()
-  (interactive)
-  (progn
-	(if mark-active
-		(kill-region (region-beginning) (region-end))
-	  (progn
-		(let ((bounds (bounds-of-thing-at-point 'word)))
-		  (if bounds
-			  (delete-region (car bounds) (cdr bounds))
-			(delete-char 1)))))
-	(god-local-mode-pause)))
-
 (use-package consult
   :ensure t
   ;; Replace bindings. Lazily loaded due by `use-package'.
   :bind (
 		 ;; replace isearch
 		 ("C-s" . consult-line)
-		 ("C-S-R" . my/replace-line)
-		 ("C-r" . my/replace-word)
-		 ("C-S-D" . kill-word)
 		 ;; C-c bindings in `mode-specific-map'
          ("C-c M-x" . consult-mode-command)
          ("C-c h" . consult-history)
@@ -356,6 +315,7 @@
   ;;;; 5. No project support
   ;; (setq consult-project-function nil)
   )
+
 ;; git/project
 (use-package projectile
   :ensure t
@@ -366,7 +326,10 @@
   (projectile-mode 1)
   :config
   (diminish 'projectile-mode))
+
 (use-package magit
+  :hook
+  (git-commit-mode . evil-insert-state)
   :ensure t)
 
 ;; markdown
@@ -415,6 +378,7 @@
   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
 :config
 (global-tree-sitter-mode)
+
 (use-package tree-sitter-langs
   :ensure t)
 
@@ -425,56 +389,16 @@
   (setq lsp-keymap-prefix "C-c l")
   :ensure t)
 
-;; telega
-(use-package telega
-  :ensure t
-  :init
-  
-  ;; set company backend for telega
-  (setq telega-emoji-company-backend 'telega-company-emoji)
-  (defun my-telega-chat-mode ()
-	(set (make-local-variable 'company-backends)
-		 (append (list telega-emoji-company-backend
-					   'telega-company-username
-					   'telega-company-hashtag
-					   'telega-company-markdown-precode)
-				 (when (telega-chat-bot-p telega-chatbuf--chat)
-				   '(telega-company-botcmd))))
-	(company-mode 1))
-  
-  (add-hook 'telega-chat-mode-hook 'my-telega-chat-mode)
-  ;; diable pair and god
-  (defun my/tg-mode-hook()
-	(progn
-	  (setq-local god-global-mode nil)
-	  (setq-local electric-pair-mode nil)))
-  (add-hook 'telega-chat-mode-hook #'my/tg-mode-hook)
-  (add-hook 'telega-root-mode-hook #'my/tg-mode-hook)
-  ;; telega notify / indicator
-  (add-hook 'telega-load-hook #'telega-notifications-mode)
-  (add-hook 'telega-load-hook #'telega-appindicator-mode)
-  (setq telega-server-libs-prefix "/usr/")
-  (define-key global-map (kbd "C-c t") telega-prefix-map)
-  
-  ;; animated images
-  (add-hook 'telega-load-hook #'telega-autoplay-mode))
-
 ;; term
-
-(defun my/vterm-leave-insert () (interactive)
-	   (if god-local-mode (vterm--self-insert) (god-local-mode +1)))
-
 (use-package vterm
   :bind
-  (:map vterm-mode-map
-		("<escape>" . my/vterm-leave-insert))
   :hook
-  (vterm-mode . (lambda()(setq-local global-company-mode nil)))
+  (vterm-mode . (lambda()(evil-local-mode -1)))
   (vterm-mode . (lambda()(company-mode -1)))
-  (vterm-mode . (lambda()(setq-local god-global-mode nil)))
   :custom
   (setq vterm-timer-delay 0.01)
   :ensure t)
+
 (use-package multi-vterm
   :ensure t
   :bind (("C-S-t" . multi-vterm)
@@ -483,65 +407,13 @@
          ("<S-left>" . multi-vterm-prev)))
 
 ;; god
-(defun my/god-mode-leave() (interactive)
-	   (progn
-		 (if (string-match-p "^[[:blank:]]*$" (buffer-substring (line-beginning-position) (point)))
-			 (back-to-indentation))
-		 (god-local-mode-pause)))
-
-(defun my/god-mode-esc() (interactive)
-	   (if (not god-local-mode) (god-local-mode +1)
-		 (progn
-		   (if (active-minibuffer-window)
-			   (progn
-				 (select-window (active-minibuffer-window))
-				 (abort-minibuffers))
-			 (keyboard-quit)))))
-
 (use-package god-mode
   :ensure t
   :init
   (global-set-key (kbd "C-S-f") #'make-frame)
-  (global-set-key (kbd "<escape>") #'my/god-mode-esc)
-  (define-key minibuffer-local-map (kbd "<escape>") #'abort-minibuffers)
   :config
-  (god-mode)
-
   ;; some maps
-  (define-key god-local-mode-map (kbd ".") #'repeat)
-  (define-key god-local-mode-map (kbd "i") #'my/god-mode-leave)
-  
-  ;; cursor and mode line
-  (defun my-god-mode-update-cursor-type ()
-	(setq cursor-type (if (or god-local-mode buffer-read-only) 'box 'bar)))
-  (add-hook 'post-command-hook #'my-god-mode-update-cursor-type)
-
-  ;; overwrite mode
-  (defun my-god-mode-toggle-on-overwrite ()
-	"Toggle god-mode on overwrite-mode."
-	(if (bound-and-true-p overwrite-mode)
-		(god-local-mode-pause)
-      (god-local-mode-resume)))
-  (add-hook 'overwrite-mode-hook #'my-god-mode-toggle-on-overwrite)
-
-  ;; isearch
-  (require 'god-mode-isearch)
-  (define-key isearch-mode-map (kbd "<escape>") #'god-mode-isearch-activate)
-  (define-key god-mode-isearch-map (kbd "i") #'god-mode-isearch-disable)
-  (define-key god-mode-isearch-map (kbd "<escape>") #'isearch-abort)
-  )
-
-;; fold
-(use-package ts-fold
-  :ensure t
-  :straight (ts-fold :type git :host github :repo "emacs-tree-sitter/ts-fold")
-  :bind
-  ("C-z" . nil)
-  ("C-z C-o" . ts-fold-open)
-  ("C-z C-t" . ts-fold-toggle)
-  ("C-z C-c" . ts-fold-close)
-  :config
-  (global-ts-fold-mode))
+  (define-key god-local-mode-map (kbd ".") #'repeat))
 
 ;; template
 (use-package yatemplate
@@ -634,7 +506,10 @@
   :ensure t)
 
 ;; org
-(add-hook 'org-src-mode-hook 'god-local-mode-pause)
+(use-package org
+  :hook
+  (org-src-mode . evil-insert-state))
+
 (use-package org-bullets
   :ensure t
   :hook
@@ -652,6 +527,64 @@
   :ensure t
   :bind
   ("C-:" . avy-goto-word-0))
+
+;; evil
+
+(defun my/evil-esc ()
+  (interactive)
+  (if (not (active-minibuffer-window))
+	  (evil-force-normal-state)
+	(progn
+	  (select-window (active-minibuffer-window))
+	  (abort-minibuffers))))
+
+(use-package evil
+  :ensure t
+  :hook
+  (minibuffer-setup . (lambda ()
+						(setq-local cursor-type 'bar)))
+  :custom
+  (completion-in-region-function 'consult-completion-in-region)
+  (evil-undo-system 'undo-redo)
+  (evil-want-integration t)
+  (evil-want-keybinding nil)
+  :config
+  (evil-mode))
+
+(use-package evil-collection
+  :after evil
+  :ensure t
+  :config
+  (evil-collection-init)
+  (diminish 'evil-collection-unimpaired-mode))
+
+(use-package evil-org
+  :hook
+  (org-mode . evil-org-mode)
+  :ensure t)
+
+(use-package evil-god-state
+  :ensure
+  :config
+  (evil-define-key 'normal global-map " " 'evil-execute-in-god-state)
+  (define-key evil-normal-state-map (kbd "<escape>") #'my/evil-esc)
+  (define-key minibuffer-mode-map (kbd "<escape>") #'abort-minibuffers)
+  (add-hook 'evil-god-state-entry-hook (lambda () (diminish 'god-local-mode)))
+  (add-hook 'evil-god-state-exit-hook (lambda () (diminish-undo 'god-local-mode)))
+  (evil-define-key 'god global-map [escape] 'evil-god-state-bail))
+
+;; fold
+(use-package ts-fold
+  :ensure t
+  :straight (ts-fold :type git :host github :repo "emacs-tree-sitter/ts-fold")
+  :config
+  (global-ts-fold-mode))
+
+;; comment
+(use-package evil-commentary
+  :ensure t
+  :config
+  (evil-commentary-mode))
 
 ;; ebuild
 (add-hook 'ebuild-mode-hook 'company-ebuild-setup)
