@@ -558,11 +558,6 @@
   (evil-collection-init)
   (diminish 'evil-collection-unimpaired-mode))
 
-(use-package evil-org
-  :hook
-  (org-mode . evil-org-mode)
-  :ensure t)
-
 (use-package evil-god-state
   :ensure
   :config
@@ -585,6 +580,10 @@
   :ensure t
   :config
   (evil-commentary-mode))
+
+;; yaml
+(use-package yaml-mode
+  :ensure t)
 
 ;; ebuild
 (add-hook 'ebuild-mode-hook 'company-ebuild-setup)
