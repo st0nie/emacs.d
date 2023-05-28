@@ -177,6 +177,9 @@
   :hook
   (prog-mode . flycheck-mode))
 
+(use-package consult-flycheck
+  :ensure t)
+
 ;; vertico
 (use-package vertico
   :ensure t
@@ -384,10 +387,16 @@
 
 ;; lsp
 (use-package lsp-mode
-  :init
-  (add-hook 'c-mode-hook #'lsp)
-  (setq lsp-keymap-prefix "C-c l")
+  :hook
+  (c-mode . lsp)
+  :custom
+  (lsp-keymap-prefix "C-c l")
   :ensure t)
+
+(use-package lsp-ui
+  :ensure t
+  :custom
+  (lsp-ui-doc-position 'at-point))
 
 ;; term
 (use-package vterm
@@ -541,16 +550,20 @@
 
 (use-package evil
   :ensure t
+  :init
+  (setq evil-undo-system 'undo-redo)
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
   :hook
   (minibuffer-setup . (lambda ()
 						(setq-local cursor-type 'bar)))
   :custom
   (completion-in-region-function 'consult-completion-in-region)
-  (evil-undo-system 'undo-redo)
-  (evil-want-integration t)
-  (evil-want-keybinding nil)
   :config
-  (evil-mode))
+  (evil-mode 1)
+  (evil-define-key 'normal 'lsp-mode "gr" 'xref-find-references)
+  (evil-define-key 'normal 'lsp-mode "gR" 'lsp-rename)
+  (evil-define-key 'normal 'lsp-mode "K" 'lsp-ui-doc-glance))
 
 (use-package evil-collection
   :after evil
