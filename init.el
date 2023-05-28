@@ -408,10 +408,8 @@
 
 (use-package multi-vterm
   :ensure t
-  :bind (("C-S-t" . multi-vterm)
-         :map vterm-mode-map
-         ("<S-right>" . multi-vterm-next)
-         ("<S-left>" . multi-vterm-prev)))
+  :bind
+  ("C-S-t" . multi-vterm))
 
 ;; god
 (use-package god-mode
@@ -561,9 +559,13 @@
   (completion-in-region-function 'consult-completion-in-region)
   :config
   (evil-mode 1)
+  ;; lsp
   (evil-define-key 'normal 'lsp-mode "gr" 'xref-find-references)
   (evil-define-key 'normal 'lsp-mode "gR" 'lsp-rename)
-  (evil-define-key 'normal 'lsp-mode "K" 'lsp-ui-doc-glance))
+  (evil-define-key 'normal 'lsp-mode "K" 'lsp-ui-doc-glance)
+  ;; vterm
+  (evil-define-key 'insert vterm-mode-map (kbd "<S-left>") 'multi-vterm-prev)
+  (evil-define-key 'insert vterm-mode-map (kbd "<S-right>") 'multi-vterm-next))
 
 (use-package evil-collection
   :after evil
