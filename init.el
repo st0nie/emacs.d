@@ -74,6 +74,7 @@
 
 ;; highlight line
 (add-hook 'prog-mode-hook #'hl-line-mode)
+(add-hook 'text-mode-hook #'hl-line-mode)
 (add-hook 'activate-mark-hook
 		  (lambda ()
 		    (hl-line-mode -1)))
@@ -82,7 +83,9 @@
 			(if (derived-mode-p 'prog-mode)(hl-line-mode +1))))
 
 ;; line number
+(setq display-line-numbers-type 'relative)
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
+(add-hook 'text-mode-hook #'display-line-numbers-mode)
 (column-number-mode 1)
 (line-number-mode 0)
 
@@ -133,20 +136,20 @@
   :bind
   (:map company-active-map
 		("<escape>" . company-abort))
-  :init
-  (setq company-tooltip-align-annotations t)
-  (setq company-selection-wrap-around t)
-  (setq company-idle-delay 0.1)
-  (setq company-require-match nil)
   :custom
+  (company-tooltip-align-annotations t)
+  (company-selection-wrap-around t)
+  (company-idle-delay 0.1)
+  (company-require-match nil)
   (global-company-mode t)
   :config
-  ;; orderless
-  (defun just-one-face (fn &rest args)
-	(let ((orderless-match-faces [completions-common-part]))
-      (apply fn args)))
-  (advice-add 'company-capf--candidates :around #'just-one-face)
-  )
+  ;; We follow a suggestion by company maintainer u/hvis:
+  ;; https://www.reddit.com/r/emacs/comments/nichkl/comment/gz1jr3s/
+  (defun company-completion-styles (capf-fn &rest args)
+	(let ((completion-styles '(basic partial-completion)))
+	  (apply capf-fn args)))
+
+  (advice-add 'company-capf :around #'company-completion-styles))
 
 (use-package company-quickhelp
   :ensure t
@@ -185,17 +188,18 @@
   :ensure t
   :init
   (vertico-mode))
+
 (use-package savehist
   :ensure t
   :init
   (savehist-mode))
+
 (use-package orderless
   :ensure t
-  :init
-  (setq orderless-component-separator "[ &]")
-  (setq completion-styles '(orderless)
-		completion-category-defaults nil
-		completion-category-overrides '((file (styles . (partial-completion))))))
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles basic partial-completion)))))
+
 (use-package marginalia
   :ensure t
   :bind (("M-A" . marginalia-cycle)
