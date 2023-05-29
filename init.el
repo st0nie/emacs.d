@@ -584,6 +584,12 @@
   (add-hook 'evil-god-state-exit-hook (lambda () (diminish-undo 'god-local-mode)))
   (evil-define-key 'god global-map [escape] 'evil-god-state-bail))
 
+;; vim-surround
+(use-package evil-surround
+  :ensure t
+  :config
+  (global-evil-surround-mode 1))
+
 ;; fold
 (use-package ts-fold
   :ensure t
