@@ -403,7 +403,8 @@
   :hook
   (vterm-mode . (lambda()(company-mode -1)))
   :custom
-  (setq vterm-timer-delay 0.01)
+  (vterm-buffer-name-string "vterm %s")
+  (vterm-timer-delay 0.01)
   :ensure t)
 
 (use-package multi-vterm
