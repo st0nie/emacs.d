@@ -391,8 +391,6 @@
 
 ;; lsp
 (use-package lsp-mode
-  :hook
-  (c-mode . lsp)
   :custom
   (lsp-keymap-prefix "C-c l")
   :ensure t)
@@ -400,7 +398,8 @@
 (use-package lsp-ui
   :ensure t
   :custom
-  (lsp-ui-doc-position 'at-point))
+  (lsp-ui-doc-position 'at-point)
+  (lsp-ui-doc-show-with-mouse nil))
 
 ;; term
 (use-package vterm
@@ -551,6 +550,12 @@
 	  (select-window (active-minibuffer-window))
 	  (abort-minibuffers))))
 
+(defun my/evil-lsp-doc-toggle ()
+  "Toggle lsp-ui-doc."
+  (interactive)
+  (if (not (lsp-ui-doc--frame-visible-p))(lsp-ui-doc-glance)
+	  (lsp-ui-doc-hide)))
+
 (use-package evil
   :ensure t
   :init
@@ -567,7 +572,7 @@
   ;; lsp
   (evil-define-key 'normal 'lsp-mode "gr" 'xref-find-references)
   (evil-define-key 'normal 'lsp-mode "gR" 'lsp-rename)
-  (evil-define-key 'normal 'lsp-mode "K" 'lsp-ui-doc-glance)
+  (evil-define-key 'normal 'lsp-mode "K" 'my/evil-lsp-doc-toggle)
   ;; vterm
   (evil-define-key 'insert vterm-mode-map (kbd "<S-left>") 'multi-vterm-prev)
   (evil-define-key 'insert vterm-mode-map (kbd "<S-right>") 'multi-vterm-next))
@@ -611,6 +616,12 @@
 ;; yaml
 (use-package yaml-mode
   :ensure t)
+
+;; ccls
+(use-package ccls
+  :ensure t
+  :hook ((c-mode c++-mode objc-mode cuda-mode) .
+         (lambda () (require 'ccls) (lsp))))
 
 ;; ebuild
 (add-hook 'ebuild-mode-hook 'company-ebuild-setup)
