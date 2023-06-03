@@ -623,6 +623,13 @@
   :hook ((c-mode c++-mode objc-mode cuda-mode) .
          (lambda () (require 'ccls) (lsp))))
 
+;; editorconfig
+(use-package editorconfig
+  :ensure t
+  :config
+  (editorconfig-mode 1)
+  (diminish 'editorconfig-mode))
+
 ;; ebuild
 (add-hook 'ebuild-mode-hook 'company-ebuild-setup)
 (add-hook 'ebuild-mode-hook 'flycheck-pkgcheck-setup)
