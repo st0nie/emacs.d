@@ -73,14 +73,13 @@
 (blink-cursor-mode 0)
 
 ;; highlight line
-(add-hook 'prog-mode-hook #'hl-line-mode)
-(add-hook 'text-mode-hook #'hl-line-mode)
-(add-hook 'activate-mark-hook
-		  (lambda ()
-		    (hl-line-mode -1)))
-(add-hook 'deactivate-mark-hook
-		  (lambda ()
-			(if (derived-mode-p 'prog-mode)(hl-line-mode +1))))
+(defvar-local was-hl-line-mode-on nil)
+(defun my/hl-line-mode-on()
+  (setq was-hl-line-mode-on t)
+  (hl-line-mode))
+
+(add-hook 'text-mode-hook #'my/hl-line-mode-on)
+(add-hook 'prog-mode-hook #'my/hl-line-mode-on)
 
 ;; line number
 (setq display-line-numbers-type 'relative)
@@ -576,6 +575,13 @@
   ;; vterm
   (evil-define-key 'insert vterm-mode-map (kbd "<S-left>") 'multi-vterm-prev)
   (evil-define-key 'insert vterm-mode-map (kbd "<S-right>") 'multi-vterm-next))
+
+(add-hook 'evil-visual-state-entry-hook
+		  (lambda ()
+		    (hl-line-mode -1)))
+(add-hook 'evil-visual-state-exit-hook
+		  (lambda ()
+			(if was-hl-line-mode-on (hl-line-mode +1))))
 
 (use-package evil-collection
   :after evil
