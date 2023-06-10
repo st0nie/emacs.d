@@ -177,7 +177,11 @@
 (use-package flycheck
   :ensure t
   :hook
-  (prog-mode . flycheck-mode))
+  (prog-mode . flycheck-mode)
+  (flycheck-mode . flycheck-inline-mode))
+
+(use-package flycheck-inline
+  :ensure t)
 
 (use-package consult-flycheck
   :ensure t)
@@ -398,7 +402,8 @@
   :ensure t
   :custom
   (lsp-ui-doc-position 'at-point)
-  (lsp-ui-doc-show-with-mouse nil))
+  (lsp-ui-doc-show-with-mouse nil)
+  (lsp-ui-sideline-enable nil))
 
 ;; term
 (use-package vterm
@@ -553,7 +558,7 @@
   "Toggle lsp-ui-doc."
   (interactive)
   (if (not (lsp-ui-doc--frame-visible-p))(lsp-ui-doc-glance)
-	  (lsp-ui-doc-hide)))
+	(lsp-ui-doc-hide)))
 
 (use-package evil
   :ensure t
