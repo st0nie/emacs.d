@@ -628,11 +628,30 @@
 (use-package yaml-mode
   :ensure t)
 
-;; ccls
+;; c/c++
 (use-package ccls
   :ensure t
   :hook ((c-mode c++-mode objc-mode cuda-mode) .
          (lambda () (require 'ccls) (lsp))))
+
+(use-package cc-mode
+  :config
+  (c-add-style "llvm.org"
+			   '("gnu"
+				 (fill-column . 80)
+				 (c++-indent-level . 2)
+				 (c-basic-offset . 2)
+				 (indent-tabs-mode)
+				 (c-offsets-alist
+				  (arglist-intro . ++)
+				  (innamespace . 0)
+				  (member-init-intro . ++)))))
+
+(use-package lua-mode
+  :ensure t
+  :config
+  :hook
+  (lua-mode . lsp))
 
 ;; editorconfig
 (use-package editorconfig
