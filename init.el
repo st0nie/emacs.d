@@ -635,6 +635,8 @@
          (lambda () (require 'ccls) (lsp))))
 
 (use-package cc-mode
+  :custom
+  (c-default-style "llvm.org")
   :config
   (c-add-style "llvm.org"
 			   '("gnu"
