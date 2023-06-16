@@ -573,9 +573,9 @@
   (completion-in-region-function 'consult-completion-in-region)
   :config
   (evil-mode 1)
+  (evil-define-key 'normal 'global "gh" 'xref-find-references)
   ;; lsp
-  (evil-define-key 'normal 'lsp-mode "gr" 'xref-find-references)
-  (evil-define-key 'normal 'lsp-mode "gR" 'lsp-rename)
+  (evil-define-key 'normal 'lsp-mode "gr" 'lsp-rename)
   (evil-define-key 'normal 'lsp-mode "K" 'my/evil-lsp-doc-toggle)
   ;; vterm
   (evil-define-key 'insert vterm-mode-map (kbd "<S-left>") 'multi-vterm-prev)
@@ -591,6 +591,8 @@
 (use-package evil-collection
   :after evil
   :ensure t
+  :custom
+  (evil-collection-want-find-usages-bindings nil)
   :config
   (evil-collection-init)
   (diminish 'evil-collection-unimpaired-mode))
