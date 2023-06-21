@@ -351,7 +351,7 @@
   :ensure t
   :bind
   ("M-o" . ace-window)
-  ("M-O" . ace-swap-window))
+  ("M-p" . ace-swap-window))
 
 ;; embark
 (use-package embark
@@ -396,6 +396,7 @@
 (use-package lsp-mode
   :custom
   (lsp-keymap-prefix "C-c l")
+  (lsp-restart 'ignore)
   :ensure t)
 
 (use-package lsp-ui
