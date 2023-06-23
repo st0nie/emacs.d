@@ -106,9 +106,14 @@
     (make-directory my-auto-save-dir)))
 
 ;; session management
-(add-hook 'desktop-not-loaded-hook #'desktop-save-mode-off)
-(setq desktop-load-locked-desktop 'check-pid)
-(desktop-save-mode 1)
+(setq default-frame-alist
+       '((height . 40)
+         (width . 130)
+         (left . 0)
+         (top . 0)))
+;; (add-hook 'desktop-not-loaded-hook #'desktop-save-mode-off)
+;; (setq desktop-load-locked-desktop 'check-pid)
+;; (desktop-save-mode 1)
 
 ;; for vertico
 (defun crm-indicator (args)
@@ -668,3 +673,9 @@
 ;; ebuild
 (add-hook 'ebuild-mode-hook 'company-ebuild-setup)
 (add-hook 'ebuild-mode-hook 'flycheck-pkgcheck-setup)
+
+;; dashboard
+(use-package dashboard
+  :ensure t
+  :config
+  (dashboard-setup-startup-hook))
