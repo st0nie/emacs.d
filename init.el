@@ -352,11 +352,19 @@
 (use-package markdown-mode
   :ensure t)
 
+(defun my/ace-window ()
+  "Switch to windows and disable im if needed."
+  (interactive)
+  (ace-select-window)
+  (if (not (eq evil-state 'insert))
+	  (my/evil-disable-im)
+	(my/evil-restore-im)))
+
 ;; ace-window
 (use-package ace-window
   :ensure t
   :bind
-  ("M-o" . ace-window)
+  ("M-o" . my/ace-window)
   ("M-p" . ace-swap-window))
 
 ;; embark
