@@ -195,7 +195,8 @@
 (use-package vertico
   :ensure t
   :init
-  (vertico-mode))
+  (vertico-mode)
+  (vertico-mouse-mode))
 
 (use-package savehist
   :ensure t
