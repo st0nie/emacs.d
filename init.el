@@ -566,12 +566,37 @@
   (if (not (lsp-ui-doc--frame-visible-p))(lsp-ui-doc-glance)
 	(lsp-ui-doc-hide)))
 
+(defvar my/previous-im "keyboard-us")
+(defun my/evil-disable-im ()
+  "Disable fcitx5."
+  (interactive)
+  (setq my/previous-im
+		(substring
+		 (shell-command-to-string "fcitx5-remote -n")
+		 0 -1))
+  (call-process-shell-command
+   "fcitx5-remote -c"))
+
+(defun my/evil-restore-im ()
+  "Restore fcitx5."
+  (interactive)
+  (call-process-shell-command
+   (concat "fcitx5-remote -s " my/previous-im)))
+
+(defun my/evil-toggle-im ()
+  "Toggle fcitx5."
+  (interactive)
+  (call-process-shell-command
+   "fcitx5-remote -t"))
+
 (use-package evil
   :ensure t
   :init
   (setq evil-undo-system 'undo-redo)
   (setq evil-want-integration t)
   (setq evil-want-keybinding nil)
+  (setq evil-want-Y-yank-to-eol t)
+  (setq x-select-enable-clipboard nil)
   :hook
   (minibuffer-setup . (lambda ()
 						(setq-local cursor-type 'bar)))
@@ -580,6 +605,10 @@
   :config
   (evil-mode 1)
   (evil-define-key 'normal 'global "gh" 'xref-find-references)
+  (define-key global-map (kbd "C-S-v") #'clipboard-yank)
+  (define-key global-map (kbd "C-S-c") #'clipboard-kill-ring-save)
+  (define-key global-map (kbd "<S-insert>") #'clipboard-yank)
+  (evil-define-key 'insert 'global (kbd "C-\\") #'my/evil-toggle-im)
   ;; lsp
   (evil-define-key 'normal 'lsp-mode "gr" 'lsp-rename)
   (evil-define-key 'normal 'lsp-mode "K" 'my/evil-lsp-doc-toggle)
@@ -590,6 +619,10 @@
 (add-hook 'evil-visual-state-entry-hook
 		  (lambda ()
 		    (hl-line-mode -1)))
+(add-hook 'evil-insert-state-exit-hook
+		  #'my/evil-disable-im)
+(add-hook 'evil-insert-state-entry-hook
+		  #'my/evil-restore-im)
 (add-hook 'evil-visual-state-exit-hook
 		  (lambda ()
 			(if was-hl-line-mode-on (hl-line-mode +1))))
@@ -679,3 +712,12 @@
   :ensure t
   :config
   (dashboard-setup-startup-hook))
+
+;; smooth scroll
+(use-package good-scroll
+  :ensure t
+  :custom
+  (scroll-step 1)
+  (scroll-conservatively 101)
+  :config
+  (good-scroll-mode))
