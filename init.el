@@ -146,6 +146,7 @@
   (company-idle-delay 0.1)
   (company-require-match nil)
   (global-company-mode t)
+  (company-format-margin-function 'company-text-icons-margin)
   :config
   ;; We follow a suggestion by company maintainer u/hvis:
   ;; https://www.reddit.com/r/emacs/comments/nichkl/comment/gz1jr3s/
@@ -730,3 +731,10 @@
   (scroll-conservatively 101)
   :config
   (good-scroll-mode))
+
+;; evil enhancement
+(use-package evil-terminal-cursor-changer
+  :ensure t
+  :config
+  (unless (display-graphic-p)
+	(evil-terminal-cursor-changer-activate)))
