@@ -597,7 +597,7 @@
   (setq evil-want-integration t)
   (setq evil-want-keybinding nil)
   (setq evil-want-Y-yank-to-eol t)
-  (setq x-select-enable-clipboard nil)
+  (setq select-enable-clipboard nil)
   :hook
   (minibuffer-setup . (lambda ()
 						(setq-local cursor-type 'bar)))
