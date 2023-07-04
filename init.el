@@ -88,8 +88,9 @@
 (column-number-mode 1)
 (line-number-mode 0)
 
-;; disable tool-bar
+;; disable tool-bar and scroll-bar
 (tool-bar-mode -1)
+(scroll-bar-mode -1)
 
 ;; tab-indent
 (setq-default tab-width 4)
