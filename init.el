@@ -56,7 +56,7 @@
                (seq-uniq (append use-package-selected-packages package-selected-packages))))))
 
 (setq custom-file "~/.emacs.d/custom.el")
-(load custom-file)
+(setq straight-use-package-by-default t)
 
 ;; mode-line
 (use-package diminish
@@ -195,8 +195,9 @@
 ;; vertico
 (use-package vertico
   :ensure t
-  :init
+  :config
   (vertico-mode)
+  (require 'vertico-mouse)
   (vertico-mouse-mode))
 
 (use-package savehist
@@ -529,7 +530,9 @@
 
 ;; doom theme
 (use-package doom-themes
-  :ensure t)
+  :ensure t
+  :config
+  (load custom-file))
 
 ;; auto-format
 (use-package format-all

@@ -18,3 +18,4 @@ straight/
 /*.sqlite
 games
 /templates/
+/flycheck_init.el
