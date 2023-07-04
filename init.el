@@ -436,6 +436,28 @@
   :bind
   ("C-S-t" . multi-vterm))
 
+(use-package vterm-toggle
+  :ensure t
+  :bind
+  (("C-\\" . vterm-toggle)
+   :map vterm-mode-map
+   ("C-\\" . vterm-toggle))
+  :config
+  (setq vterm-toggle-fullscreen-p nil)
+  (add-to-list 'display-buffer-alist
+			   '((lambda (buffer-or-name _)
+				   (let ((buffer (get-buffer buffer-or-name)))
+					 (with-current-buffer buffer
+					   (or (equal major-mode 'vterm-mode)
+						   (string-prefix-p vterm-buffer-name (buffer-name buffer))))))
+				 (display-buffer-reuse-window display-buffer-at-bottom)
+				 ;;(display-buffer-reuse-window display-buffer-in-direction)
+				 ;;display-buffer-in-direction/direction/dedicated is added in emacs27
+				 ;;(direction . bottom)
+				 ;;(dedicated . t) ;dedicated is supported in emacs27
+				 (reusable-frames . visible)
+				 (window-height . 0.3))))
+
 ;; god
 (use-package god-mode
   :ensure t
@@ -622,7 +644,7 @@
   (define-key global-map (kbd "C-S-v") #'clipboard-yank)
   (define-key global-map (kbd "C-S-c") #'clipboard-kill-ring-save)
   (define-key global-map (kbd "<S-insert>") #'clipboard-yank)
-  (evil-define-key 'insert 'global (kbd "C-\\") #'my/evil-toggle-im)
+  ;; (evil-define-key 'insert 'global (kbd "C-\\") #'my/evil-toggle-im)
   ;; lsp
   (evil-define-key 'normal 'lsp-mode "gr" 'lsp-rename)
   (evil-define-key 'normal 'lsp-mode "K" 'my/evil-lsp-doc-toggle)
@@ -746,3 +768,25 @@
 ;; systemd
 (use-package systemd
   :ensure t)
+
+;; tree
+(use-package treemacs
+  :bind
+  ("<C-tab>" . treemacs-select-window)
+  :ensure t)
+(use-package treemacs-projectile
+  :ensure t)
+(use-package treemacs-magit
+  :ensure t)
+(use-package treemacs-evil
+  :ensure t)
+
+;; icons
+(use-package treemacs-all-the-icons
+  :ensure t
+  :config
+  (treemacs-load-theme "all-the-icons"))
+(use-package all-the-icons-dired
+  :ensure t
+  :hook
+  (dired-mode . all-the-icons-dired-mode))
