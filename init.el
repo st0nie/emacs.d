@@ -544,6 +544,7 @@
   :ensure t
   :custom
   (org-startup-indented t)
+  (org-latex-create-formula-image-program 'dvisvgm)
   :hook
   (org-mode . org-bullets-mode))
 
@@ -738,3 +739,7 @@
   :config
   (unless (display-graphic-p)
 	(evil-terminal-cursor-changer-activate)))
+
+;; systemd
+(use-package systemd
+  :ensure t)
