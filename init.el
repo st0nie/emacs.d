@@ -401,10 +401,11 @@
 ;; tree-sitter
 (use-package tree-sitter
   :ensure t
-  :init
-  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
   :custom
-  (global-tree-sitter-mode t))
+  (global-tree-sitter-mode t)
+  :config
+  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+  (diminish 'tree-sitter-mode "TS"))
 
 (use-package tree-sitter-langs
   :ensure t)
@@ -693,8 +694,10 @@
 (use-package ts-fold
   :ensure t
   :straight (ts-fold :type git :host github :repo "emacs-tree-sitter/ts-fold")
+  :custom
+  (global-ts-fold-mode t)
   :config
-  (global-ts-fold-mode))
+  (diminish 'ts-fold-mode))
 
 ;; comment
 (use-package evil-commentary
