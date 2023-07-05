@@ -402,9 +402,9 @@
 (use-package tree-sitter
   :ensure t
   :init
-  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
-:config
-(global-tree-sitter-mode)
+  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+  :custom
+  (global-tree-sitter-mode t))
 
 (use-package tree-sitter-langs
   :ensure t)
@@ -686,8 +686,8 @@
 ;; vim-surround
 (use-package evil-surround
   :ensure t
-  :config
-  (global-evil-surround-mode 1))
+  :custom
+  (global-evil-surround-mode t))
 
 ;; fold
 (use-package ts-fold
@@ -699,8 +699,8 @@
 ;; comment
 (use-package evil-commentary
   :ensure t
-  :config
-  (evil-commentary-mode))
+  :custom
+  (evil-commentary-mode t))
 
 ;; yaml
 (use-package yaml-mode
