@@ -196,9 +196,10 @@
 ;; vertico
 (use-package vertico
   :ensure t
+  :straight (:files (:defaults "extensions/*")
+					:includes (vertico-mouse))
   :config
   (vertico-mode)
-  (require 'vertico-mouse)
   (vertico-mouse-mode))
 
 (use-package savehist
