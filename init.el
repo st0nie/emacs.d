@@ -184,11 +184,12 @@
 (use-package flycheck
   :ensure t
   :hook
-  (prog-mode . flycheck-mode)
-  (flycheck-mode . flycheck-inline-mode))
+  (prog-mode . flycheck-mode))
 
 (use-package flycheck-inline
-  :ensure t)
+  :ensure t
+  :hook
+  (flycheck-mode . flycheck-inline-mode))
 
 (use-package consult-flycheck
   :ensure t)
