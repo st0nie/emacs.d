@@ -778,7 +778,7 @@
 ;; tree
 (use-package treemacs
   :bind
-  ("<C-tab>" . treemacs-select-window)
+  ("C-'" . treemacs-select-window)
   :ensure t)
 (use-package treemacs-projectile
   :ensure t)
