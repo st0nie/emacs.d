@@ -186,10 +186,10 @@
   :hook
   (prog-mode . flycheck-mode))
 
-(use-package flycheck-inline
+(use-package flycheck-posframe
   :ensure t
-  :hook
-  (flycheck-mode . flycheck-inline-mode))
+  :after flycheck
+  :config (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode))
 
 (use-package consult-flycheck
   :ensure t)
