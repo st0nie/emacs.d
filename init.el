@@ -796,3 +796,8 @@
   :ensure t
   :hook
   (dired-mode . all-the-icons-dired-mode))
+
+;; fix pdf-hidpi blurry
+(use-package doc-view
+  :custom
+  (doc-view-mupdf-use-svg t))
